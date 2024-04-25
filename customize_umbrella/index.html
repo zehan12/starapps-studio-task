@@ -11,20 +11,22 @@
 
 <body>
     <main class="container flex">
-        <figure class="flex-60 center">
-            <img width="400" src="./assets/Blue umbrella.png" />
+        <figure key="img" class="flex-60 center">
+            <img id="umbrella_img" width="400" alt="umbrella-image" src="./assets/blue_umbrella.png" />
+            <img class="logo" alt="logo" src="" />
         </figure>
         <section class="flex flex-col flex-40 justify-center">
             <h1 class="heading">Custom Umbrella</h1>
             <span class="color-container">
-                <div class="color-icon blue active"></div>
-                <div class="color-icon pink"></div>
-                <div class="color-icon yellow"></div>
+                <div data-color="blue" class="color-icon blue active"></div>
+                <div data-color="pink" class="color-icon pink"></div>
+                <div data-color="yellow" class="color-icon yellow"></div>
             </span>
             <h3 class="sub-heading">Customize your umbrella</h3>
             <p class="p-text">Upload a logo for an instant preview.</p>
             <p class="text">.png and .jpg files only. Max file size is 5MB.</p>
             <button class="button">
+                <input id="files" style="display:none;" type="file" />
                 <svg aria-hidden="true" fill="white" class="upload-icon" focusable="false" role="presentation"
                     viewBox="0 0 24 22" width="24" height="22" xmlns="http://www.w3.org/2000/svg" version="1.1">
                     <path
@@ -34,15 +36,14 @@
                         d="M8.05759 5.48615L11.234 2.32242V16.1209C11.234 16.4987 11.5375 16.801 11.9168 16.801C12.2962 16.801 12.5997 16.4987 12.5997 16.1209V2.32242L15.7761 5.48615C15.9076 5.61713 16.0846 5.68766 16.2566 5.68766C16.4336 5.68766 16.6056 5.62217 16.7371 5.48615C17.0052 5.21914 17.0052 4.79093 16.7371 4.52393L12.3974 0.201511C12.2709 0.0755667 12.0939 0 11.9168 0C11.7348 0 11.5628 0.070529 11.4363 0.201511L7.09656 4.52393C6.82849 4.79093 6.82849 5.21914 7.09656 5.48615C7.35958 5.74811 7.79457 5.74811 8.05759 5.48615Z">
                     </path>
                 </svg>
-                <p class="button-text">
-                    UPLOAD LOGO
-                </p>
+                <label for="files" class="button-text">UPLOAD LOGO</label>
+                <span class="cancel-btn">&times;</span>
             </button>
+            <div class="error"></div>
         </section>
-
     </main>
     </div>
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
