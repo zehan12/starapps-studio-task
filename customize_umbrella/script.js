@@ -5,6 +5,7 @@ const umbrellaImg = document.querySelector("#umbrella_img");
 const uploadButton = document.querySelector(".button");
 const buttonText = document.querySelector(".button-text");
 const uploadIcon = document.querySelector(".upload-icon");
+const loadingIcon = document.querySelector(".loading-icon");
 const fileInput = document.querySelector("#files");
 const label = document.querySelector("label[for=files]");
 const cancelButton = document.querySelector(".cancel-btn");
@@ -12,6 +13,7 @@ const errorText = document.querySelector(".error");
 const logo = document.querySelector(".logo");
 let isLogoPresent = false;
 let timeout;
+let colorState = "blue";
 
 colorIcons.forEach((icon) => {
   icon.addEventListener("click", () => {
@@ -22,6 +24,7 @@ colorIcons.forEach((icon) => {
     icon.classList.add("active");
 
     const color = icon.getAttribute("data-color");
+    colorState = color;
 
     clearTimeout(timeout);
 
@@ -34,7 +37,7 @@ colorIcons.forEach((icon) => {
       svg.classList.add("rotate");
       imgContainer.append(svg);
       imgContainer.removeChild(umbrellaImg);
-      logo.style.display = "none"
+      logo.style.display = "none";
 
       timeout = setTimeout(() => {
         imgContainer.removeChild(svg);
@@ -65,6 +68,7 @@ colorIcons.forEach((icon) => {
 });
 
 fileInput.addEventListener("change", () => {
+  handleLoading();
   let file = fileInput.files[0];
   console.log(file, "file");
   if (
@@ -91,10 +95,10 @@ fileInput.addEventListener("change", () => {
       return;
     }
     isLogoPresent = true;
-    logo.style.display = "block";
     var fr = new FileReader();
     fr.onload = function () {
       logo.src = fr.result;
+      logo.style.display = "block";
     };
     fr.readAsDataURL(file);
     cancelButton.style.display = "block";
@@ -104,6 +108,33 @@ fileInput.addEventListener("change", () => {
     label.innerText = fileName ?? "UPLOAD FILE";
   }
 });
+
+const handleLoading = () => {
+  const svg = createSVG(
+    getComputedStyle(document.documentElement).getPropertyValue(
+      `--${colorState}`
+    )
+  );
+
+  logo.style.display = "none";
+  svg.classList.add("rotate");
+  imgContainer.append(svg);
+  imgContainer.removeChild(umbrellaImg);
+  uploadIcon.style.display = "none";
+  loadingIcon.style.display = "block";
+  loadingIcon.classList.add("rotate");
+
+  setTimeout(() => {
+    imgContainer.removeChild(svg);
+    imgContainer.append(umbrellaImg);
+    umbrellaImg.classList.add("fade-in-image");
+    umbrellaImg.src = `./assets/${colorState}_umbrella.png`;
+    umbrellaImg.style.opacity = 1;
+    uploadIcon.style.display = "block";
+    loadingIcon.style.display = "none";
+    loadingIcon.classList.remove("rotate");
+  }, 2000);
+};
 
 cancelButton.addEventListener("click", (e) => {
   console.log("click button");
@@ -117,7 +148,6 @@ cancelButton.addEventListener("click", (e) => {
 });
 
 const createSVG = (color) => {
-  console.log(color);
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("width", "80");
   svg.setAttribute("height", "80");

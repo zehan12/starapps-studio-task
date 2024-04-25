@@ -138,6 +138,11 @@ body {
   background-color: var(--blue);
 }
 
+.loading-icon {
+  display: none;
+  margin: 15px;
+}
+
 .button-text {
   width: 100%;
   background-color: var(--blue);
