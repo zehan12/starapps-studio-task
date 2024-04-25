@@ -12,140 +12,168 @@ const cancelButton = document.querySelector(".cancel-btn");
 const errorText = document.querySelector(".error");
 const logo = document.querySelector(".logo");
 let isLogoPresent = false;
+let file = null;
+let activeIcon;
 let timeout;
 let colorState = "blue";
 
-colorIcons.forEach((icon) => {
-  icon.addEventListener("click", () => {
-    colorIcons.forEach((i) => {
-      i.classList.remove("active");
-    });
+function updateColor(icon) {
+  const color = icon.getAttribute("data-color");
+  console.log(color, "got color");
+  colorState = color;
 
-    icon.classList.add("active");
+  clearTimeout(timeout);
+  updateUI(color);
+}
 
-    const color = icon.getAttribute("data-color");
-    colorState = color;
+const updateUI = (color) => {
+  colorIcons.forEach((i) => i.classList.remove("active"));
+  activeIcon = document.querySelector(`.color-icon[data-color="${color}"]`);
+  activeIcon.classList.add("active");
 
-    clearTimeout(timeout);
+  umbrellaImg.classList.remove("fade-in-image");
+  updateImage(color);
 
-    if (isLogoPresent) {
-      const svg = createSVG(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          `--${color}`
-        )
-      );
-      svg.classList.add("rotate");
-      imgContainer.append(svg);
-      imgContainer.removeChild(umbrellaImg);
-      logo.style.display = "none";
-
-      timeout = setTimeout(() => {
-        imgContainer.removeChild(svg);
-        imgContainer.append(umbrellaImg);
-        umbrellaImg.classList.add("fade-in-image");
-        umbrellaImg.src = `./assets/${color}_umbrella.png`;
-        umbrellaImg.style.opacity = 1;
-        logo.style.opacity = 1;
-        logo.style.display = "block";
-      }, 1000);
-    } else {
-      timeout = setTimeout(() => {
-        umbrellaImg.classList.add("fade-in-image");
-        umbrellaImg.src = `./assets/${color}_umbrella.png`;
-        umbrellaImg.style.opacity = 1;
-      }, 100);
-    }
-
-    umbrellaImg.classList.remove("fade-in-image");
-
-    icon.style.borderColor = `var(--${color}-outline)`;
-    icon.style.backgroundColor = `var(--${color})`;
-    uploadButton.style.backgroundColor = `var(--${color})`;
-    buttonText.style.backgroundColor = `var(--${color})`;
-    uploadIcon.style.backgroundColor = `var(--${color})`;
-    body.style.backgroundColor = `var(--${color}-background)`;
-  });
-});
-
-fileInput.addEventListener("change", () => {
-  handleLoading();
-  let file = fileInput.files[0];
-  console.log(file, "file");
-  if (
-    !file.type.includes("png") &&
-    !file.type.includes("jpg") &&
-    !file.type.includes("jpeg")
-  ) {
-    file = null;
-    errorText.innerText = "File type not supported!";
-    setTimeout(() => {
-      errorText.innerText = "";
-    }, 1500);
-    return;
-  }
-
-  if (file) {
-    const fileSize = file.size / (1024 * 1024);
-    if (fileSize > 5) {
-      file = null;
-      errorText.innerText = "File size exceeds 5 MB!";
-      setTimeout(() => {
-        errorText.innerText = "";
-      }, 1500);
-      return;
-    }
-    isLogoPresent = true;
-    var fr = new FileReader();
-    fr.onload = function () {
-      logo.src = fr.result;
-      logo.style.display = "block";
-    };
-    fr.readAsDataURL(file);
-    cancelButton.style.display = "block";
-    let fileName = fileInput.files[0]?.name;
-    if (fileName.length > 12)
-      fileName = fileName.substr(0, 12) + "..." + fileName.substr(-5);
-    label.innerText = fileName ?? "UPLOAD FILE";
-  }
-});
-
-const handleLoading = () => {
-  const svg = createSVG(
-    getComputedStyle(document.documentElement).getPropertyValue(
-      `--${colorState}`
-    )
-  );
-
-  logo.style.display = "none";
-  svg.classList.add("rotate");
-  imgContainer.append(svg);
-  imgContainer.removeChild(umbrellaImg);
-  uploadIcon.style.display = "none";
-  loadingIcon.style.display = "block";
-  loadingIcon.classList.add("rotate");
-
-  setTimeout(() => {
-    imgContainer.removeChild(svg);
-    imgContainer.append(umbrellaImg);
-    umbrellaImg.classList.add("fade-in-image");
-    umbrellaImg.src = `./assets/${colorState}_umbrella.png`;
-    umbrellaImg.style.opacity = 1;
-    uploadIcon.style.display = "block";
-    loadingIcon.style.display = "none";
-    loadingIcon.classList.remove("rotate");
-  }, 2000);
+  updateStyles(color);
 };
 
-cancelButton.addEventListener("click", (e) => {
-  console.log("click button");
+const updateImage = (color) => {
+  const svg = createSVG(
+    getComputedStyle(document.documentElement).getPropertyValue(`--${color}`)
+  );
+  imgContainer.innerHTML = "";
+  imgContainer.append(svg);
+
+  timeout = setTimeout(
+    () => {
+      imgContainer.innerHTML = "";
+      imgContainer.append(umbrellaImg);
+      imgContainer.append(logo);
+      umbrellaImg.src = `./assets/${color}_umbrella.png`;
+      umbrellaImg.classList.add("fade-in-image");
+    },
+    isLogoPresent ? 1000 : 100
+  );
+  if (isLogoPresent && file) {
+    logo.src = URL.createObjectURL(file);
+    logo.style.display = "block";
+    logo.style.zIndex = "100";
+  }
+};
+
+const updateStyles = (color) => {
+  const styleVar = `var(--${color})`;
+  [uploadButton, buttonText, uploadIcon].forEach((elem) => {
+    elem.style.backgroundColor = styleVar;
+  });
+
+  activeIcon.style.borderColor = `var(--${color}-outline)`;
+  activeIcon.style.backgroundColor = styleVar;
+  body.style.backgroundColor = `var(--${color}-background)`;
+};
+
+colorIcons.forEach((icon) => {
+  icon.addEventListener("click", () => updateColor(icon));
+});
+
+const handleFileUpload = (event) => {
+  file = event.target.files[0];
+  if (file && validateFile(file)) {
+    updateLabel(file.name);
+    cancelButton.style.display = "block";
+  } else {
+    return;
+  }
+  handleLoading(file);
+
+  setTimeout(() => {
+    logo.src = URL.createObjectURL(file);
+    logo.style.display = "block";
+  }, 4000);
+
+  isLogoPresent = true;
+};
+
+const validateFile = (file) => {
+  if (!/image\/(png|jpe?g)$/i.test(file.type)) {
+    showError("File type not supported!");
+    return false;
+  }
+
+  const fileSize = file.size / (1024 * 1024);
+  if (fileSize > 5) {
+    showError("File size exceeds 5 MB!");
+    return false;
+  }
+
+  return true;
+};
+
+function showError(message) {
+  errorText.innerText = message;
+  setTimeout(() => (errorText.innerText = ""), 1500);
+}
+
+function updateLabel(fileName) {
+  label.innerText =
+    fileName.length > 12
+      ? `${fileName.substr(0, 12)}...${fileName.substr(-5)}`
+      : fileName;
+}
+
+cancelButton.addEventListener("click", handleCancel);
+
+function handleCancel(e) {
   e.stopPropagation();
+  handleRemoveLogo();
+}
+
+const handleRemoveLogo = () => {
   fileInput.value = "";
+  file = null;
   label.innerText = "UPLOAD LOGO";
   cancelButton.style.display = "none";
   logo.src = "";
   logo.style.display = "none";
   isLogoPresent = false;
-});
+};
+
+const handleLoading = () => {
+  const colorValue = getComputedStyle(
+    document.documentElement
+  ).getPropertyValue(`--${colorState}`);
+
+  const svg = createSVG(colorValue);
+  svg.classList.add("rotate");
+
+  if (imgContainer.contains(umbrellaImg)) {
+    imgContainer.removeChild(umbrellaImg);
+  }
+
+  imgContainer.appendChild(svg);
+
+  if (imgContainer.contains(logo)) {
+    logo.style.display = "none";
+  }
+
+  uploadIcon.style.display = "none";
+  loadingIcon.style.display = "block";
+  loadingIcon.classList.add("rotate");
+
+  setTimeout(() => {
+    if (imgContainer.contains(svg)) {
+      imgContainer.removeChild(svg);
+    }
+    imgContainer.appendChild(umbrellaImg);
+    umbrellaImg.src = `./assets/${colorState}_umbrella.png`;
+    umbrellaImg.classList.add("fade-in-image");
+    umbrellaImg.style.opacity = 1;
+
+    uploadIcon.style.display = "block";
+    loadingIcon.style.display = "none";
+    loadingIcon.classList.remove("rotate");
+  }, 2000);
+};
 
 const createSVG = (color) => {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");

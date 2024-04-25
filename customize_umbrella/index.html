@@ -11,7 +11,7 @@
 
 <body>
     <main class="container flex">
-        <figure key="img" class="flex-60 center">
+        <figure class="flex-60 center">
             <img id="umbrella_img" width="400" alt="umbrella-image" src="./assets/blue_umbrella.png" />
             <img class="logo" alt="logo" src="" />
         </figure>
@@ -26,7 +26,7 @@
             <p class="p-text">Upload a logo for an instant preview.</p>
             <p class="text">.png and .jpg files only. Max file size is 5MB.</p>
             <button class="button">
-                <input id="files" style="display:none;" type="file">
+                <input id="files" style="display:none;" type="file" accept="image/*" onchange="handleFileUpload(event)">
                 <svg aria-hidden="true" fill="white" class="loading-icon" focusable="false" role="presentation"
                     viewBox="0 0 28.3 31.2" width="28.3" height="31.2" version="1.1" xmlns="http://www.w3.org/2000/svg">
                     <path
