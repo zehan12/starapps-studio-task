@@ -18,14 +18,15 @@ Create an umbrella customize tool for an umbrella seller. The seller offers umbr
 - HTML
 - CSS
 
-#### Live: [https://starapps-studio-task.vercel.app/](https://starapps-studio-task.vercel.app/).
+#### Live
+ [https://starapps-studio-task.vercel.app/](https://starapps-studio-task.vercel.app/).
 
-#### Demo:
+#### Demo
 
 [![Watch the video](https://img.youtube.com/vi/cXO8-f3d21A/maxresdefault.jpg)](https://youtu.be/cXO8-f3d21A)
 
 
-### Demo
+### Details
 
 You can find the demo details and design specifications [here](https://www.notion.so/Customize-umbrella-646488afdb9b4e03893600fbf05f0711).
 
